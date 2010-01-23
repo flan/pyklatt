@@ -1,0 +1,535 @@
+#LyX 1.5.6 created this file. For more info see http://www.lyx.org/
+\lyxformat 276
+\begin_document
+\begin_header
+\textclass article
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\paperfontsize default
+\spacing single
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation skip
+\defskip medskip
+\quotes_language swedish
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+LING/CPSC 599 Project Write-up
+\end_layout
+
+\begin_layout Author
+Sydni Bennie, Neil Tallim
+\end_layout
+
+\begin_layout Date
+June 20, 2009
+\end_layout
+
+\begin_layout Abstract
+This paper describes an implementation of a Klatt-like synthesizer with
+ provisions to enable approximations of human prosody in arbitrary languages.
+\end_layout
+
+\begin_layout Abstract
+It features an interface that maps IPA input to synthesis parameters and
+ applies some universal contour-shaping and sound-blending routines to create
+ a generic speech stream.
+ Language-specific rulesets may be applied to transform the speech stream
+ into something that sounds more natural and understandable to speakers
+ of the target language.
+\end_layout
+
+\begin_layout Abstract
+This project was developed and advanced through the combination of the skills
+ of a computer scientist, who wrote the synthesizer elements and implemented
+ all transformational routines, and the knowledge of a linguist, who provided
+ the content to use for synthesis, the prosody rules that were applied,
+ and who defined the conditions under which the success of this project
+ were to be evaluated.
+\end_layout
+
+\begin_layout Section
+Project Background
+\end_layout
+
+\begin_layout Standard
+As any casual Google search will reveal, the Klatt synthesizer model, while
+ a very interesting and significant step forward in synthesizer technology,
+ really isn't all that good at sounding natural, especially by comparison
+ to more modern solutions, such as Festival, which uses diphones sampled
+ from the speech of an actual human, and therefore sounds a lot more pleasing.
+\end_layout
+
+\begin_layout Standard
+In fact, the main problem with the Klatt model is how unnatural it sounds
+ to native speakers of a language: it has no natural sound transitions,
+ and it works by synthesizing essentially repeating patterns of sound.
+\end_layout
+
+\begin_layout Standard
+Another problem, although one understood to be more of a limitation in the
+ technologies available at the time it was conceived, is that pure-IPA interface
+s to the Klatt synthesizer did not seem to exist, which greatly increased
+ the amount of time that had to be invested to attain meaningful results.
+\end_layout
+
+\begin_layout Standard
+This project was advanced with three purposes in mind:
+\end_layout
+
+\begin_layout Enumerate
+To explore the potential of the Klatt syntheizer model applying strictly
+ linear transformations to the sounds it produces, attempting to bring human-lik
+e prosody to its monotone pulses
+\end_layout
+
+\begin_layout Enumerate
+To make the synthesizer more accessible by implementing a pure-IPA interface
+ that hides the internals from those without a need to see them
+\end_layout
+
+\begin_layout Enumerate
+To create a basis for future projects that may be undertaken by other students
+\end_layout
+
+\begin_layout Subsection
+Organic nature of the problem
+\end_layout
+
+\begin_layout Standard
+The interactive language of typical humans is based on a broad range of
+ elements, all of which must work together to achieve the goals of producing
+ and comprehending communicative utterances.
+ Linguists, and those from other disciplines, have been studying the domain
+ of language acquisition, development, and production, which covers subdisciplin
+es including, but not limited to, semantics, syntax, phonology, neurolinguistics
+, and pragmatics, with the intent of being able to reach a better understanding
+ of this unique ability we share.
+\end_layout
+
+\begin_layout Standard
+This project, in particular, is an exploration of phonology, with a concentratio
+n on its respectful sub-field of prosody.
+\end_layout
+
+\begin_layout Subsection
+Scope Definition
+\end_layout
+
+\begin_layout Standard
+Because of the limited amount of time available to us during the semester
+ in which this project was undertaken, we had to limit both the the scope
+ and the depth of the aspects of the prosodic rules explored to the following
+ areas:
+\end_layout
+
+\begin_layout Itemize
+Smoothing transitions between phonemes
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Phonemes, in the Klatt model, are comprised of a single formant data-set.
+ In reality, however, the formants that are produced are themselves influenced
+ by the phonemes that surround them in the speech-stream
+\end_layout
+
+\begin_layout Itemize
+Although, when spoken in isolation, reasonably constant formant values may
+ be observed for vowel sounds, when vowels appear next to other sounds --
+ consonants and vowels alike, when neighbouring, will yield a biphone, and
+ that must be accounted for if any synthetic speech is to sound believable.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Applying liaisons between words
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+As with phoneme transitions, a terminal consonant on a word will generally
+ bleed into the vowel that leads its successor, even in Canadian English
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Applying nasalization patterns to vowels
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+When a nasal-vowel sequence appears, the vowel is regressively nasalized
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Emphasized and quoted speech intonation patterns
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Increased pitch range and varied rates of speech, in accordance with normal
+ Canadian patterns
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Content-word stressing
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Emphasis placed on words that serve to identify new content being added
+ to a discussion
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Diphthong structuring
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Reduced emphasis on vowel-vowel clusters, reflecting how English speakers
+ underplay the second constituent phoneme
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Vowel-liquid interaction
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Vowels take on some of the properties of a following liquid, improving the
+ ability of the synthesizer to approximate human articulation patterns
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Pitch accents
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Although four main pitch accents are represented in English, we only implemented
+ rules for three of them, two of which fall under question-related rising:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Falling tone
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Spoken English has a falling intonation pattern across a statement with
+ added vowel-lengthening in the word-final position
+\end_layout
+
+\begin_layout Itemize
+The full tone is used to indicate a turn-taking opportunity or belief in
+ the content of the utterance
+\end_layout
+
+\begin_layout Itemize
+In this case, even a question can have a falling tone, if the speaker already
+ believes they know the answer; example: 
+\begin_inset Quotes eld
+\end_inset
+
+Isn't he nice[.|?]
+\begin_inset Quotes erd
+\end_inset
+
+ (rhetorical|inquisitive)
+\end_layout
+
+\begin_layout Itemize
+Phrase-boundary rules were also applied: phrase breaks within ambiguous
+ utterances can be disambiguated using appropriate intonation patterns that
+ reflect syntactic parsing; examples: 
+\begin_inset Quotes eld
+\end_inset
+
+Those who sold | quickly made a profit.
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+Those who sold quickly | made a profit.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Question-phrase intonation patterns
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\noun on
+Low-rise
+\noun default
+: a rising tone applied to yes/no questions: utterances begin with a low
+ tone, which progressively rises towards the end of the sentence; this intonatio
+n pattern is used when the speaker genuinely doesn’t know the answer to
+ their question
+\end_layout
+
+\begin_layout Itemize
+
+\noun on
+High-rise
+\noun default
+: another rising tone, which applies to all other forms of questions: utterances
+ begin with a medium tone and progressively rise towards the end of the
+ sentence; this intonation pattern is used when asking for clarification
+ or to imply disbelief
+\end_layout
+
+\end_deeper
+\end_deeper
+\end_deeper
+\begin_layout Section
+Approach
+\end_layout
+
+\begin_layout Standard
+English prosody is a well-studied topic, so we had a solid basis upon which
+ to begin our exploration.
+ The challenge we faced was to determine how to translate organic, intuitive,
+ often semantically bound properties of spoken language into mathematical
+ formulas with only phonetic transcriptions to use as a basis for syntactic
+ inference.
+\end_layout
+
+\begin_layout Standard
+We began by exploring some simple ideas, such as how a content word is given
+ increased stress when spoken as part of a sentence, and expanded our rules
+ from there.
+ We also gave a great deal of attention to how each individual IPA character
+ is rendered, carefully massaging frequencies and timing to achieve generally
+ 
+\begin_inset Quotes eld
+\end_inset
+
+real
+\begin_inset Quotes erd
+\end_inset
+
+-sounding results.
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Standard
+This project has been implemented in Python, with extensive documentation.
+ It is based on two relatively modern versions of the Klatt synthesizer
+ model: the readily available GPLv1 Klatt 3.04 C implementation that is widely
+ distributed across the Internet, and a Klatt Parallel/Cascade synthesizer
+ implemented by Sean McLennan in Simulink for error-correction and data-simplifi
+cation purposes.
+ Full attribution is provided as part of the system's standard distribution.
+\end_layout
+
+\begin_layout Standard
+The resulting system is a hybridization of both of these implementations,
+ with the following additional features:
+\end_layout
+
+\begin_layout Itemize
+concurrent observation and control of the synthetic speech stream, allowing
+ us to achieve more target-like transitions between sounds
+\end_layout
+
+\begin_layout Itemize
+render-time availability of statistical information, enabling us to manipulate
+ phonemes as they're processed, using highly precise, dynamic information
+ sampled from the semantics present in their unique surrounding environments
+\end_layout
+
+\begin_layout Itemize
+automatic IPA-to-speech processing
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+hides all of the intimidating strings of numbers that are typically associated
+ with Klatt synthesizers from users who have no reason to work with them,
+ and offers meaningful English terminology to those who do, without compromising
+ efficiency
+\end_layout
+
+\begin_layout Itemize
+enables behind-the-scenes pre-processing of the input IPA, letting the computer
+ correct for details such as lengthening, shortening, and subtly epenthesizing
+ phonemes where appropriate, and applying universal patterns that linguists
+ generally take for granted when transcribing language
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+support for arbitrary language rule-sets and extension of the core synthesizer
+ mechanics
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+allows the prosody rules of one language to be easily swapped out for another,
+ making this system more versatile as a research project platform
+\end_layout
+
+\begin_layout Itemize
+enables more advanced processing techniques to be implemented without compromisi
+ng any other features that already exist or may come into being
+\end_layout
+
+\end_deeper
+\begin_layout Section
+Assessment
+\end_layout
+
+\begin_layout Standard
+Determining whether prosody had been improved was a largely subjective task,
+ requiring the input and rationality of a human.
+ We declared 
+\begin_inset Quotes eld
+\end_inset
+
+success
+\begin_inset Quotes erd
+\end_inset
+
+ where we found that applying the rules we had devised resulted in speech
+ that sounded, to others, more 
+\begin_inset Quotes eld
+\end_inset
+
+natural
+\begin_inset Quotes erd
+\end_inset
+
+ than the same speech without modification; however, our definition of success
+ is gradable: we are fully aware that the rules we have created are not,
+ and cannot be, perfect -- such is not the nature of language to begin with
+ -- so, accordingly, we could not take a pass/fail approach to this concept.
+\end_layout
+
+\begin_layout Standard
+Overall success, in our estimation, is a measure of how well all implemented
+ rules stack to produce more natural-sounding speech; it is not based on
+ how many rules we managed to create.
+ As such, this project was, as planned, largely a process of learning and
+ exploration, rather than an attempt to reach a point arbitrarily pre-determined
+ as "satisfactory".
+\end_layout
+
+\begin_layout Subsection
+Evaluation Techniques
+\end_layout
+
+\begin_layout Standard
+To minimize bias, we hoped to use a number of our peers as evaluators, opting
+ to expose them first to repeated playback of a sample not modified by language-
+specific rule-sets, and then having them listen to a prosody-enhanced version
+ of the same speech, with a comparison drawn between their comprehension
+ of both forms; their personal preference would have also been taken into
+ consideration.
+ After exposure to both forms, once their blind comprehension had been measured,
+ they were to be shown the IPA corresponding to what was heard.
+\end_layout
+
+\begin_layout Section
+Results and conclusion
+\end_layout
+
+\begin_layout Standard
+Unfortunately, we were able to coerce only a few volunteers to provide us
+ with feedback, so our hopes for an unbiased sample fell short of expectations.
+ However, we do feel that, based on what anecdotal evidence of success we
+ received, we can declare that this project was 
+\begin_inset Quotes eld
+\end_inset
+
+for the win.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We found that, of those used as subjects, there was consensus that the prosodica
+l enhancements made the speech easier to understand, although there were
+ still words that were determined to be unclear until the IPA transcriptions
+ were shown.
+ By and large, the words with which comprehension difficulty was reported
+ matched those we expected to be problematic, and they stem from a fundamental
+ weakness with the cascade-parallel Klatt model: aspiration and rolling
+ sounds are hard to produce.
+\end_layout
+
+\begin_layout Section
+Further extension
+\end_layout
+
+\begin_layout Standard
+As mentioned, under Project Background, one of the motivating factors behind
+ this project was the potential for its use as a basis for future projects
+ by other students.
+ To this end, a short guide to extending the system's capabilities is provided
+ as part of the standard distribution, and all code is thoroughly documented.
+\end_layout
+
+\begin_layout Standard
+One area in which attention should be focused is on artificial aspiration
+ and sound modulation: implementing a randomly shifting pattern for problematic
+ phonemes would likely go a long way towards making them more audible and,
+ therefore, overcoming the greatest obstacle this system faces.
+\end_layout
+
+\begin_layout Standard
+Another would be on the formant-mapped values that implement the IPA sounds.
+ All of the source data is British in origin, which conflicts, just a little,
+ with Canadian phonological recognition.
+\end_layout
+
+\end_body
+\end_document

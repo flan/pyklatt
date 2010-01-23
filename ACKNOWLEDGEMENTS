@@ -1,0 +1,28 @@
+This project reimplements and extends a C implementation of Dennis Klatt's
+Fortran implementation of his cascade-parallel formant synthesizer, as published
+in JASA.
+
+From the C implementation, as written by Jon Iles (j.p.iles@cs.bham.ac.uk):
+	The code was posted to comp.speech in 1993, and has been updated by me to fix
+	a number of bugs that had been introduced. Subsequently major rewrites have
+	been done by Nick Ing-Simmons to improve efficiency and change the code into
+	a more acceptable ANSI C style, and by me to remove all global variable
+	references, fix bugs and ensure portability.
+
+	(c) 1993 Jon Iles and Nick Ing-Simmons
+
+The C implementation, released under the GPLv1, was retrieved from
+	http://www.cs.cmu.edu/afs/cs/project/ai-repository/ai/areas/speech/systems/
+	klatt/0.html
+on June 6, 2009.
+
+
+This project borrows algorithmic enhancements and inspiration from a Simulink®
+implementation of the Klatt Synthesizer model, as described by Sean McLennan in
+2000 for S522 - Digital Signal Processing under Dr. Diane Kewley-Port at Indiana
+University.
+
+This paper, believed to be published as public-domain or otherwise academics-
+friendly terms, was retrieved from
+	http://www.shaav.com/professional/linguistics/klatt.pdf
+on June 7th, 2009.

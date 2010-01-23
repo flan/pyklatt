@@ -1,0 +1,76 @@
+This implementation of the Klatt synthesizer was created with the intent of
+being very easy to use, and very easy to extend. This document explains the
+basics of its usage.
+
+First, you will need Python 2.4 or later (3.0 is not currently supported).
+
+After that, to run it, you will need an input file. For convenience's sake,
+this synthesizer accepts a nearly completely faithful form of IPA, with the
+following considerations:
+- 'I' and 'w' replace their IPA lookalikes
+- Only a subset of all IPA characters have been implemented; see the header of
+  src/ipa.py for a full list
+- Some special markup is available to help apply prosody patterns:
+-- ": place one on both sides of a portion of a sentence and the contained text
+   will be considered 'quoted'
+-- *: place one on both sides of a portion of a sentence and the contained text
+   will be considered 'emphasized'
+-- ': place this before any word and it will be considered a stressed content
+   element
+-- ,: place this after any word and it will be followed by a brief pause
+
+-- >: place any number of these after any IPA character and the sound's duration
+   will be multiplied by 1.5 for each one found
+-- <: place any number of these after any IPA character and the sound's duration
+   will be multiplied by 0.5 for each one found
+-- +: place any number of these after any IPA character and the sound's pitch
+   will be multiplied by 0.975 for each one found (this raises pitch)
+-- -: place any number of these after any IPA character and the sound's pitch
+   will be multiplied by 1.025 for each one found (this lowers pitch)
+--- >, <, +, and - can be combined to fine-tune sounds
+
+-- .: place this at the end of a sentence to mark it as a normal statement
+-- !: place this at the end of a sentence to mark it as an exclamation
+-- ?: place this at the end of a sentence to mark it as a question
+--- ? and ! can be combined
+
+-- linebreak: sentences on the same line will be considered part of the same
+   paragraph; to add more paragraphs, just separate them by any number of
+   linebreaks
+
+A collection of valid input files may be found in data/.
+
+
+Once you have a data file, to synthesize it, just enter the following command in
+the same directory where you found this README:
+	python klatt.py <input file>
+
+This program supports a number of options; to see a list, type the following
+instead:
+	python klatt.py --help
+
+
+--- The following is applicable to developers only ---
+Adding a new language is meant to be a simple process:
+- Copy the ruleset for an existing language, such as
+  src/languages/english_canadian.py
+- Change line 17 in src/language_rules.py to reference your new ruleset
+- Define/alter/add/remove rules as necessary for your language, using the
+  examples in english_canadian.py as a guide
+- Specify the order in which the rules should be applied at the bottom of your
+  language ruleset
+- The program will automatically apply your rules the next time it's run
+
+Adding new IPA characters is even easier, assuming you have formant data:
+- Edit src/ipa.py
+- Copy one of the existing entities in the IPA dictionary
+- Paste it in the appropriate position
+- Change the values as needed (and remember to use a unicode value in the key
+  position)
+- The digesting logic will figure out the rest automatically
+
+If you would like to make use of the official Subversion repository,
+http://hamsterx.homelinux.org/svn/klatt/, either so that you don't have to
+maintain one of your own, or because you'd like to share your improvements with
+the world, please send an e-mail to neil.tallim@gmail.com (or poke
+flan@irc.synirc.org) and something will be set up.
