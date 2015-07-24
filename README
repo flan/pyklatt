@@ -68,9 +68,3 @@ Adding new IPA characters is even easier, assuming you have formant data:
 - Change the values as needed (and remember to use a unicode value in the key
   position)
 - The digesting logic will figure out the rest automatically
-
-If you would like to make use of the official Subversion repository,
-http://hamsterx.homelinux.org/svn/klatt/, either so that you don't have to
-maintain one of your own, or because you'd like to share your improvements with
-the world, please send an e-mail to neil.tallim@gmail.com (or poke
-flan@irc.synirc.org) and something will be set up.
